@@ -25,11 +25,7 @@ private final class MenuBarClock: NSObject {
         item.autosaveName = "com.harrisonleath.utcmenu.status-item"
         return item
     }()
-    private let clockFont = NSFont.monospacedDigitSystemFont(ofSize: 0, weight: .regular)
-    private let pillColor = NSColor(srgbRed: 0.36, green: 0.40, blue: 0.45, alpha: 1)
-    private let pillCornerRadius: CGFloat = 6
-    private let pillHorizontalPadding: CGFloat = 10
-    private let pillVerticalPadding: CGFloat = 4
+    private let clockFont = NSFont.monospacedDigitSystemFont(ofSize: 14, weight: .regular)
     private let clockFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -48,7 +44,8 @@ private final class MenuBarClock: NSObject {
     func start() {
         guard let button = statusItem.button else { return }
 
-        button.imagePosition = .imageOnly
+        button.imagePosition = .noImage
+        button.font = clockFont
         button.toolTip = "Current Coordinated Universal Time"
         statusItem.menu = makeMenu()
 
@@ -87,43 +84,8 @@ private final class MenuBarClock: NSObject {
         guard let button = statusItem.button else { return }
         let now = Date()
         let title = "UTC \(clockFormatter.string(from: now))"
-        button.image = makePillImage(title: title)
+        button.title = title
         button.toolTip = "UTC: \(timestampFormatter.string(from: now))"
-    }
-
-    private func makePillImage(title: String) -> NSImage {
-        let text = NSAttributedString(
-            string: title,
-            attributes: [
-                .font: clockFont,
-                .foregroundColor: NSColor.white,
-            ]
-        )
-        let textSize = text.size()
-        let imageSize = NSSize(
-            width: ceil(textSize.width + pillHorizontalPadding * 2),
-            height: ceil(textSize.height + pillVerticalPadding * 2)
-        )
-        let pillColor = pillColor
-        let pillCornerRadius = pillCornerRadius
-        let image = NSImage(size: imageSize, flipped: false) { rect in
-            pillColor.setFill()
-            NSBezierPath(
-                roundedRect: rect.insetBy(dx: 0.5, dy: 0.5),
-                xRadius: pillCornerRadius,
-                yRadius: pillCornerRadius
-            ).fill()
-            text.draw(
-                at: NSPoint(
-                    x: (imageSize.width - textSize.width) / 2,
-                    y: (imageSize.height - textSize.height) / 2
-                )
-            )
-            return true
-        }
-        image.isTemplate = false
-        image.accessibilityDescription = title
-        return image
     }
 
     @objc private func copyTimestamp() {
