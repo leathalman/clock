@@ -83,7 +83,7 @@ private final class MenuBarClock: NSObject {
     @objc private func updateClock() {
         guard let button = statusItem.button else { return }
         let now = Date()
-        let title = "UTC \(clockFormatter.string(from: now))"
+        let title = "\(clockFormatter.string(from: now)) UTC"
         button.title = title
         button.toolTip = "UTC: \(timestampFormatter.string(from: now))"
     }
